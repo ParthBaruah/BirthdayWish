@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Chinu ❤️</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght=700&family=Cinzel:wght=600;800&family=Quicksand:wght=400;600;700&family=Sacramento&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pastelPink: '#FFD1DC',
+                        lavender: '#E6E6FA',
+                        cherryBlossom: '#FFB7C5',
+                        softGold: '#D4AF37',
+                        animeSky: '#87CEEB',
+                        dreamyDeep: '#1B1429',
+                    },
+                    fontFamily: {
+                        dancing: ['"Dancing Script"', 'cursive'],
+                        cinzel: ['"Cinzel"', 'serif'],
+                        sacramento: ['"Sacramento"', 'cursive'],
+                        sans: ['"Quicksand"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(27, 20, 41, 0.95); }
+        ::-webkit-scrollbar-thumb { background: #FFB7C5; border-radius: 4px; }
+        
+        body {
+            background-color: #0d0a15;
+            color: #f3f4f6;
+            overflow-x: hidden;
+            font-family: 'Quicksand', sans-serif;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        .glass-card-dark {
+            background: rgba(15, 10, 25, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 183, 197, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        .ghibli-sky {
+            background: linear-gradient(180deg, #1d1830 0%, #3e335e 35%, #885b7e 60%, #e2979b 85%, #ffd1dc 100%);
+        }
+
+        .text-glow {
+            text-shadow: 0 0 12px rgba(255, 183, 197, 0.8), 0 0 24px rgba(255, 183, 197, 0.4);
+        }
+
+        @keyframes floatingDisk { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .disk-spin { animation: floatingDisk 12s linear infinite; }
+
+        @keyframes softFloat {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+        .floating-element { animation: softFloat 6s ease-in-out infinite; }
+
+        .candle-light {
+            position: absolute; inset: -14px; border-radius: 9999px;
+            background: radial-gradient(circle, rgba(255, 244, 178, 0.95) 0%, rgba(251, 191, 36, 0.65) 34%, rgba(251, 113, 133, 0.2) 62%, transparent 76%);
+            filter: blur(7px); animation: candleGlow 1.4s ease-in-out infinite alternate;
+        }
+        .flame-shape {
+            position: absolute; inset: 0; border-radius: 80% 20% 55% 45% / 55% 25% 75% 45%;
+            background: linear-gradient(160deg, #fff7ad 0%, #fbbf24 42%, #fb7185 78%);
+            box-shadow: 0 0 18px rgba(251, 191, 36, 1), 0 0 34px rgba(251, 113, 133, 0.75);
+            transform: rotate(45deg); animation: flameDance 0.9s ease-in-out infinite alternate;
+        }
+        @keyframes candleGlow { from { transform: scale(0.86); opacity: 0.7; } to { transform: scale(1.22); opacity: 1; } }
+        @keyframes flameDance { from { transform: rotate(39deg) scale(0.92) translateY(1px); } to { transform: rotate(51deg) scale(1.08) translateY(-2px); } }
+
+        .sakura-canvas, #fireworksCanvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;
+        }
+        .sakura-canvas { z-index: 40; }
+        #fireworksCanvas { z-index: 9999; }
+
+        /* Ghibli Art-Filter Overlay Styles */
+        .ghibli-styled-frame {
+            filter: saturate(1.4) contrast(1.05) brightness(1.05);
+            box-shadow: inset 0 0 20px rgba(212, 175, 55, 0.3), 0 10px 25px rgba(0,0,0,0.4);
+        }
+    </style>
+</head>
+<body class="overflow-hidden bg-black select-none">
+
+    <canvas id="sakuraCanvas" class="sakura-canvas"></canvas>
+    <canvas id="fireworksCanvas"></canvas>
+
+    <div id="globalMusicPlayer" class="fixed bottom-6 right-6 z-50 hidden flex items-center gap-3 bg-black/60 backdrop-blur-md border border-cherryBlossom/40 p-2.5 rounded-full shadow-2xl scale-95 hover:scale-100 transition-all">
+        <audio id="bgMusic" loop></audio>
+        <div id="musicDisk" class="w-11 h-11 rounded-full border-2 border-white/80 shadow-md relative overflow-hidden disk-spin">
+            <img id="diskImage" src="" class="w-full h-full object-cover" alt="Music Cover">
+        </div>
+        <div id="playerControls" class="flex items-center gap-3 px-1.5">
+            <button id="playPauseBtn" class="w-8 h-8 rounded-full bg-cherryBlossom text-dreamyDeep flex items-center justify-center focus:outline-none" onclick="toggleAudioTrack()">
+                <i class="fa-solid fa-pause" id="playIcon"></i>
+            </button>
+            <div class="flex flex-col">
+                <span class="text-[10px] text-cherryBlossom font-semibold tracking-wider uppercase" id="trackNameLabel">Birthday Tune</span>
+                <span class="text-[9px] text-white/60 truncate w-24">Soundtrack Loaded</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="setupScreen" class="fixed inset-0 z-[200] bg-gradient-to-b from-dreamyDeep to-black flex items-center justify-center p-4 overflow-y-auto">
+        <div class="max-w-xl w-full glass-card border border-white/10 rounded-2xl p-6 md:p-8 shadow-2xl space-y-5 my-8">
+            <div class="text-center">
+                <div class="w-16 h-16 rounded-full bg-cherryBlossom/20 flex items-center justify-center mx-auto mb-3 border border-cherryBlossom">
+                    <i class="fa-solid fa-wand-magic-sparkles text-3xl text-cherryBlossom"></i>
+                </div>
+                <h1 class="font-cinzel text-xl md:text-2xl text-cherryBlossom text-glow font-bold">Personalized Studio Engine</h1>
+                <p class="text-white/60 text-xs mt-1">Upload your customized package to dynamically generate your Ghibli birthday landscape.</p>
+            </div>
+
+            <div class="space-y-4 text-sm">
+                <div>
+                    <label class="block text-white/80 font-semibold mb-1 text-xs uppercase tracking-wider">Recipient Name & Birthday Date</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="text" id="inputName" value="Chinu" class="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-cherryBlossom">
+                        <input type="text" id="inputDate" value="July 10, 2026" class="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-cherryBlossom">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-white/80 font-semibold mb-1 text-xs uppercase tracking-wider">Custom Background Score (.mp3 File)</label>
+                    <input type="file" id="inputMusic" accept="audio/*" class="w-full bg-white/5 border border-white/10 rounded-lg text-xs p-2 text-white">
+                </div>
+
+                <div>
+                    <label class="block text-white/80 font-semibold mb-1 text-xs uppercase tracking-wider">Dynamic Memory Snapshots (Select 5 to 10 photos)</label>
+                    <input type="file" id="inputPhotos" accept="image/*" multiple class="w-full bg-white/5 border border-white/10 rounded-lg text-xs p-2 text-white">
+                    <p class="text-[10px] text-white/40 mt-1">*Images will automatically route through the local Ghibli illustrative canvas rendering machine.</p>
+                </div>
+
+                <div>
+                    <label class="block text-white/80 font-semibold mb-1 text-xs uppercase tracking-wider">Personalized Message / Narrative Text</label>
+                    <textarea id="inputMessage" rows="3" class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-cherryBlossom text-xs">Happy Birthday to the most beautiful, comforting chapter of my life. Having you in my world makes every small moment feel cinematic, like we're floating inside a warm Ghibli frame.</textarea>
+                </div>
+            </div>
+
+            <button onclick="compileAndLaunchAdventure()" class="w-full py-3 bg-gradient-to-r from-cherryBlossom to-lavender text-dreamyDeep font-bold rounded-xl shadow-lg transition-all transform hover:scale-[1.01] text-xs uppercase tracking-widest">
+                Compile & Render Ghibli Universe ✨
+            </button>
+        </div>
+    </div>
+
+    <div id="filterProcessingScreen" class="fixed inset-0 z-[150] bg-black hidden flex-col items-center justify-center p-6 text-center">
+        <div class="relative w-24 h-24 mb-6">
+            <div class="absolute inset-0 border-4 border-cherryBlossom/20 border-t-cherryBlossom rounded-full animate-spin"></div>
+            <i class="fa-solid fa-palette text-3xl text-cherryBlossom absolute inset-0 flex items-center justify-center animate-pulse"></i>
+        </div>
+        <h2 class="font-cinzel text-xl text-white text-glow mb-2">Ghibli Art Pipeline Online</h2>
+        <p id="processingStatus" class="text-sm text-white/60 font-mono text-cherryBlossom">Simulating watercolor parameters...</p>
+        <div class="w-48 bg-white/10 h-1 rounded-full overflow-hidden mt-4">
+            <div id="filterBar" class="h-full bg-cherryBlossom w-0 transition-all duration-300"></div>
+        </div>
+    </div>
+
+    <div id="unlockScreen" class="fixed inset-0 z-[100] bg-black hidden flex-col items-center justify-center p-6 text-center">
+        <div class="max-w-md w-full glass-card border border-white/10 rounded-2xl p-8 shadow-2xl flex flex-col items-center">
+            <div class="w-20 h-20 rounded-full bg-cherryBlossom/20 flex items-center justify-center mb-6 border border-cherryBlossom animate-pulse">
+                <i class="fa-solid fa-heart text-4xl text-cherryBlossom"></i>
+            </div>
+            <h1 class="font-cinzel text-xl lg:text-2xl text-cherryBlossom text-glow font-bold mb-3" id="unlockHeaderTitle">Happy Birthday</h1>
+            <p class="text-white/75 text-xs mb-6 leading-relaxed">
+                I crafted this magical universe filled with cherry blossoms, starlight, and Ghibli wonder, just for you. Please un-mute your device volume to initialize the landscape audio experience.
+            </p>
+            <button onclick="startMainExperienceFlow()" class="w-full py-3.5 bg-gradient-to-r from-cherryBlossom to-lavender text-dreamyDeep font-bold rounded-xl shadow-lg transition-transform hover:scale-105 text-xs tracking-wider uppercase">
+                Enter Your World ✨
+            </button>
+        </div>
+    </div>
+
+    <div id="appContainer" class="hidden h-screen w-screen relative overflow-hidden">
+        <div id="mainDashboard" class="absolute inset-0 ghibli-sky flex flex-col overflow-y-auto pb-24">
+            
+            <div class="relative w-full min-h-[95vh] flex flex-col justify-between p-6 md:p-12 overflow-hidden">
+                <div class="absolute top-20 right-20 w-96 h-96 rounded-full bg-white/10 blur-[120px] pointer-events-none"></div>
+                
+                <div class="relative z-20 flex justify-between items-center w-full max-w-7xl mx-auto">
+                    <span class="font-cinzel text-md md:text-lg font-bold tracking-widest text-white"><span id="navName">CHINU</span> <span class="text-cherryBlossom text-glow">❤️</span></span>
+                    <span id="navDate" class="text-xs font-semibold text-white/80 bg-white/10 backdrop-blur-md border border-white/20 px-3.5 py-1.5 rounded-full tracking-wider">July 10, 2026 🎂</span>
+                </div>
+
+                <div class="relative z-20 max-w-xl mx-auto my-auto text-center px-4 mt-12">
+                    <div class="inline-block px-4 py-1 rounded-full bg-cherryBlossom/20 border border-cherryBlossom/40 text-cherryBlossom text-[10px] font-bold uppercase tracking-widest mb-4 floating-element" id="badgeDate">Est. 2026</div>
+                    <h1 class="font-cinzel text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight tracking-wide mb-3">
+                        Happy Birthday <br>
+                        <span class="text-cherryBlossom text-glow font-dancing font-normal text-4xl sm:text-5xl lg:text-6xl block mt-1" id="heroName">Chinu ❤️</span>
+                    </h1>
+                    <p class="text-xs md:text-sm text-white/80 max-w-md mx-auto leading-relaxed mb-6">
+                        Welcome to the secret world built explicitly for you. Dive below into chapters of your memories, illustrative vision quotes, and interactive stellar birthday modules.
+                    </p>
+                    <button id="openHeartBtn" onclick="unfoldGhibliSecretSections()" class="px-7 py-3.5 bg-gradient-to-r from-cherryBlossom to-lavender text-dreamyDeep font-bold rounded-xl shadow-lg hover:scale-105 transition-transform tracking-wider uppercase text-xs">
+                        Open My Heart <i class="fa-solid fa-heart-pulse ml-2 animate-bounce"></i>
+                    </button>
+                </div>
+
+                <div class="absolute bottom-0 left-0 w-full overflow-hidden pointer-events-none z-10 leading-none">
+                    <svg class="relative block w-full h-[140px] lg:h-[220px]" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                        <path d="M0,80 C300,40 600,100 900,50 C1050,25 1150,60 1200,80 L1200,120 L0,120 Z" fill="#2d2244" opacity="0.4"></path>
+                        <path d="M0,90 C150,70 350,110 550,75 C800,30 1000,100 1200,90 L1200,120 L0,120 Z" fill="#1b142d" opacity="0.75"></path>
+                        <path d="M0,105 C250,85 500,115 750,95 C1000,75 1100,105 1200,105 L1200,120 L0,120 Z" fill="#0d0a15"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <div id="unfoldedSecretSections" class="hidden w-full max-w-5xl mx-auto px-4 md:px-6 space-y-20 md:space-y-28 mt-8 relative z-20">
+                
+                <div class="glass-card-dark rounded-3xl p-6 md:p-10 border border-cherryBlossom/20 relative overflow-hidden">
+                    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-1 bg-gradient-to-r from-cherryBlossom to-softGold rounded-b-full"></div>
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                        <div class="lg:col-span-5 flex justify-center">
+                            <div class="relative p-3 pb-10 bg-white text-gray-800 rounded shadow-2xl rotate-[-2deg] max-w-[240px] w-full border border-gray-200">
+                                <div class="w-full h-56 rounded-sm mb-3 overflow-hidden">
+                                    <img id="letterCardImage" src="" class="w-full h-full object-cover ghibli-styled-frame" alt="Cover Frame">
+                                </div>
+                                <span class="font-dancing text-md text-gray-800 block text-center">My favorite scene 🖼️</span>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-7 space-y-4">
+                            <span class="text-cherryBlossom font-semibold tracking-wider text-[10px] uppercase block">Unfolding the heart</span>
+                            <h2 class="font-cinzel text-xl md:text-2xl font-black text-white">To My Beautiful Partner</h2>
+                            <div class="space-y-3 text-xs md:text-sm text-white/90 leading-relaxed font-sans">
+                                <p class="font-bold text-cherryBlossom">Dear <span class="letterReceiverName">Chinu</span>,</p>
+                                <p id="renderedLetterBody"></p>
+                                <p class="text-right font-dancing text-xl text-cherryBlossom mt-4">Forever Yours, <br><span class="letterSenderSignature">Parth ❤️</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="text-center">
+                        <span class="text-cherryBlossom font-semibold tracking-wider text-[10px] uppercase block mb-1">Our Collected Star Dust</span>
+                        <h2 class="font-cinzel text-2xl font-bold text-white text-glow">The Memory Gallery</h2>
+                        <p class="text-[11px] text-white/60 max-w-sm mx-auto mt-1">Every picture processed with color grading to resemble interactive canvas layers.</p>
+                    </div>
+                    <div id="dynamicGalleryGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                </div>
+
+                <div class="glass-card-dark rounded-3xl p-6 md:p-10 border border-cherryBlossom/20 text-center max-w-xl mx-auto space-y-6">
+                    <h2 class="font-cinzel text-xl font-bold text-white tracking-wide">🎂 Cast Your Deepest Wish</h2>
+                    <p class="text-xs text-white/70 max-w-xs mx-auto">Write your secret wish. Clicking the submit button will transmit it instantly directly back to the sender's console.</p>
+                    
+                    <div class="space-y-4" id="wishContainer">
+                        <input type="text" id="wishInputText" placeholder="I wish that we always..." class="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-sm text-white text-center focus:outline-none focus:border-cherryBlossom">
+                        <button onclick="transmitWishPayload()" class="px-6 py-2.5 bg-gradient-to-r from-cherryBlossom to-lavender text-dreamyDeep text-xs font-bold rounded-xl tracking-wider uppercase transition-transform hover:scale-105 shadow-md">
+                            Transmit Wish ⚡
+                        </button>
+                    </div>
+
+                    <div id="candleSystemWrapper" class="hidden flex flex-col items-center pt-4 animate-fade-in">
+                        <div class="relative w-16 h-24 flex items-end justify-center mb-4">
+                            <div class="w-5 h-16 bg-gradient-to-r from-cherryBlossom to-lavender rounded-t-sm shadow-md relative">
+                                <div id="interactiveFlame" class="absolute -top-6 left-1/2 -translate-x-1/2 w-6 h-6">
+                                    <div class="candle-light"></div>
+                                    <div class="flame-shape">
+                                        <div class="absolute left-1/2 bottom-1 w-1.5 h-3 rounded-full bg-white/90 -translate-x-1/2 blur-[0.2px]"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="triggerCandleBlowOutSequence()" class="px-5 py-2 border border-cherryBlossom text-cherryBlossom text-xs rounded-full hover:bg-cherryBlossom hover:text-dreamyDeep transition-all">
+                            Blow Out Candle 🌬️
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let customImageUrls = [];
+        let globalAudioUrl = "";
+
+        const ghibliQuotes = [
+            "Painting memory fields with analog warmth...",
+            "Adjusting watercolor landscape coefficients...",
+            "Embedding Ghibli cloud palette gradients...",
+            "Compiling love vectors into illustrative layers..."
+        ];
+
+        // 1. INPUT PARSING ENGINE & GHIBLI FILTER INTERACTION
+        function compileAndLaunchAdventure() {
+            const name = document.getElementById('inputName').value.trim();
+            const date = document.getElementById('inputDate').value.trim();
+            const musicInput = document.getElementById('inputMusic').files[0];
+            const photosInput = document.getElementById('inputPhotos').files;
+            const textMessage = document.getElementById('inputMessage').value;
+
+            if(!name || !date || photosInput.length < 1) {
+                alert("Please ensure at least Recipient Name, Date, and Photos are selected!");
+                return;
+            }
+
+            // Route Data values to DOM structures
+            document.getElementById('unlockHeaderTitle').innerText = `Happy Birthday ${name} ❤️`;
+            document.getElementById('navName').innerText = name.toUpperCase();
+            document.getElementById('heroName').innerText = `${name} ❤️`;
+            document.getElementById('navDate').innerText = `${date} 🎂`;
+            document.getElementById('badgeDate').innerText = `Est. ${date.split(',').pop().trim()}`;
+            document.querySelectorAll('.letterReceiverName').forEach(el => el.innerText = name);
+            document.getElementById('renderedLetterBody').innerText = textMessage;
+
+            // Handle Custom audio blob generation
+            if(musicInput) {
+                globalAudioUrl = URL.createObjectURL(musicInput);
+                document.getElementById('bgMusic').src = globalAudioUrl;
+            }
+
+            // Map standard object URLs for pictures
+            customImageUrls = Array.from(photosInput).map(file => URL.createObjectURL(file));
+
+            // Hide Setup, enter loading processing framework
+            document.getElementById('setupScreen').classList.add('hidden');
+            document.getElementById('filterProcessingScreen').classList.remove('hidden');
+
+            runGhibliFilterProgressAnimation();
+        }
+
+        function runGhibliFilterProgressAnimation() {
+            let step = 0;
+            const progressBar = document.getElementById('filterBar');
+            const statusLabel = document.getElementById('processingStatus');
+
+            let timer = setInterval(() => {
+                if(step < ghibliQuotes.length) {
+                    statusLabel.innerText = ghibliQuotes[step];
+                    progressBar.style.width = `${(step + 1) * 25}%`;
+                    step++;
+                } else {
+                    clearInterval(timer);
+                    // Hide process, step into Unlock Screen
+                    document.getElementById('filterProcessingScreen').classList.add('hidden');
+                    document.getElementById('unlockScreen').classList.remove('hidden');
+                }
+            }, 1000);
+        }
+
+        // 2. MAIN FLOW INJECTION
+        function startMainExperienceFlow() {
+            document.getElementById('unlockScreen').classList.add('hidden');
+            document.getElementById('appContainer').classList.remove('hidden');
+            document.getElementById('globalMusicPlayer').classList.remove('hidden');
+
+            // Autoplay music handler
+            const audioObj = document.getElementById('bgMusic');
+            if(globalAudioUrl) {
+                audioObj.play().catch(e => console.log("Audio waiting on interaction payload"));
+            }
+
+            // Set primary covers
+            document.getElementById('diskImage').src = customImageUrls[0];
+            document.getElementById('letterCardImage').src = customImageUrls[0];
+
+            // Render dynamic image blocks inside gallery view
+            renderGhibliGalleryGrid();
+            initializeSakuraCanvasEngine();
+        }
+
+        function toggleAudioTrack() {
+            const player = document.getElementById('bgMusic');
+            const icon = document.getElementById('playIcon');
+            if(player.paused) {
+                player.play();
+                icon.className = "fa-solid fa-pause";
+            } else {
+                player.observe = player.pause();
+                icon.className = "fa-solid fa-play";
+            }
+        }
+
+        function renderGhibliGalleryGrid() {
+            const grid = document.getElementById('dynamicGalleryGrid');
+            grid.innerHTML = ""; // reset
+
+            const semanticCaptures = [
+                "Unmatched Connection ✨", "Traditional Beauty 💖", "Moonlit Grace 🌙", 
+                "Our Playful Moments 💞", "Happy Travels 🗺️", "A Serenading Tune 🎵", 
+                "Sweet Horizons 🌅", "Golden Hour Radiance ☀️", "Infinite Vows 💫", "Purest Magic 🌟"
+            ];
+
+            customImageUrls.forEach((url, i) => {
+                const card = document.createElement('div');
+                card.className = "glass-card p-3 rounded-2xl flex flex-col items-center hover:scale-[1.03] transition-all duration-300 shadow-lg border border-white/10 group";
+                
+                const titleText = semanticCaptures[i % semanticCaptures.length];
+
+                card.innerHTML = `
+                    <div class="w-full h-64 rounded-xl overflow-hidden relative">
+                        <img src="${url}" class="w-full h-full object-cover ghibli-styled-frame" alt="Memory Frame">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
+                            <p class="text-[11px] text-white/90 leading-relaxed font-sans">Every snapshot with you represents a lifetime of deep comfort and aesthetic resonance inside our universe.</p>
+                        </div>
+                    </div>
+                    <span class="font-dancing text-md text-cherryBlossom mt-3 block font-semibold text-center">${titleText}</span>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function unfoldGhibliSecretSections() {
+            document.getElementById('unfoldedSecretSections').classList.remove('hidden');
+            document.getElementById('openHeartBtn').classList.add('hidden');
+            
+            // Auto scroll slightly to reveal the content smoothly
+            setTimeout(() => {
+                document.getElementById('unfoldedSecretSections').scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+        }
+
+        // 3. WISH AND CANDLE LOOPS
+        function transmitWishPayload() {
+            const text = document.getElementById('wishInputText').value.trim();
+            if(!text) {
+                alert("Please key in a genuine wish to send!");
+                return;
+            }
+            alert(`⚡ Security lock enabled. Your message payload ("${text}") has been securely transmitted directly to the sender.`);
+            document.getElementById('wishContainer').classList.add('hidden');
+            document.getElementById('candleSystemWrapper').classList.remove('hidden');
+        }
+
+        function triggerCandleBlowOutSequence() {
+            document.getElementById('interactiveFlame').classList.add('hidden');
+            initializeFireworksEngine();
+            alert("✨ Happy Birthday! The candles have been blown, and fireworks have been released into your skies!");
+        }
+
+        // 4. SAKURA BLOSSOMS CANVAS ENGINE
+        function initializeSakuraCanvasEngine() {
+            const canvas = document.getElementById('sakuraCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            let width = canvas.width = window.innerWidth;
+            let height = canvas.height = window.innerHeight;
+            
+            window.addEventListener('resize', () => {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            });
+
+            const petalArray = Array.from({length: 45}, () => ({
+                x: Math.random() * width,
+                y: Math.random() * height - height,
+                r: Math.random() * 4 + 2,
+                d: Math.random() * width,
+                velX: Math.random() * 1 + 0.5,
+                velY: Math.random() * 1.5 + 1,
+                rotation: Math.random() * 360,
+                rotationSpeed: Math.random() * 2 - 1
+            }));
+
+            function loop() {
+                ctx.clearRect(0,0,width,height);
+                petalArray.forEach(p => {
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.rotation * Math.PI / 180);
+                    ctx.beginPath();
+                    ctx.ellipse(0, 0, p.r * 1.5, p.r, 0, 0, 2 * Math.PI);
+                    ctx.fillStyle = "rgba(255, 183, 197, 0.75)";
+                    ctx.fill();
+                    ctx.restore();
+
+                    p.y += p.velY;
+                    p.x += p.velX + Math.sin(p.d / 30) * 0.5;
+                    p.rotation += p.rotationSpeed;
+
+                    if(p.y > height) {
+                        p.y = -20;
+                        p.x = Math.random() * width;
+                    }
+                });
+                requestAnimationFrame(loop);
+            }
+            loop();
+        }
+
+        // 5. FIREWORKS ENGINE ON BLOW OUT
+        function initializeFireworksEngine() {
+            const canvas = document.getElementById('fireworksCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            let particles = [];
+            
+            function spawnExplosion() {
+                const startX = Math.random() * canvas.width;
+                const startY = Math.random() * canvas.height * 0.5 + 100;
+                const baseColor = `hsl(${Math.random() * 360}, 100%, 70%)`;
+                
+                for(let i=0; i<60; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 4 + 2;
+                    particles.push({
+                        x: startX, y: startY,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        alpha: 1,
+                        color: baseColor
+                    });
+                }
+            }
+
+            let explosionTimer = setInterval(spawnExplosion, 700);
+            setTimeout(() => clearInterval(explosionTimer), 7000); // Stop spawning after 7s
+
+            function render() {
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                particles.forEach((p, index) => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.04; // gravity
+                    p.alpha -= 0.015;
+
+                    ctx.save();
+                    ctx.globalAlpha = p.alpha;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.fill();
+                    ctx.restore();
+
+                    if(p.alpha <= 0) particles.splice(index, 1);
+                });
+                requestAnimationFrame(render);
+            }
+            render();
+        }
+    </script>
+</body>
+</html>
