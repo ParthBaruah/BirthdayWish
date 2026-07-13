@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Story of Us | Happy Birthday</title>
+    <style>
+        :root {
+            --cinema-black: #0a0a0c;
+            --accent-glow: #ff3366;
+            --text-main: #ffffff;
+            --text-sub: #a0a0a8;
+            --cinema-font: 'Cinzel', 'Georgia', serif;
+        }
+
+        /* Cinematic Themes */
+        .theme-romantic { --accent-glow: #ff3366; --cinema-font: 'Georgia', serif; }
+        .theme-starry { --accent-glow: #38bdf8; --cinema-font: 'Courier New', monospace; }
+        .theme-vintage { --accent-glow: #c5a880; --cinema-font: 'Times New Roman', serif; }
+        .theme-minimal { --accent-glow: #ffffff; --cinema-font: 'Arial', sans-serif; }
+        .theme-neon { --accent-glow: #00ffcc; --cinema-font: 'Impact', sans-serif; }
+
+        * { box-sizing: border-box; }
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background-color: var(--cinema-black);
+            color: var(--text-main);
+            font-family: var(--cinema-font);
+            overflow: hidden;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        /* Cinematic Aspect Ratio Container (16:9 widescreen feel) */
+        .cinema-viewport {
+            position: relative;
+            width: 100vw; height: 100vh;
+            max-width: 100%; max-height: 100%;
+            display: flex; justify-content: center; align-items: center;
+            background: #000;
+            box-shadow: inset 0 0 100px rgba(0,0,0,0.8);
+        }
+
+        /* Movie Letterbox Bars */
+        .cinema-viewport::before, .cinema-viewport::after {
+            content: ''; position: absolute; left: 0; width: 100%; height: 8vh;
+            background: #000; z-index: 10; transition: all 1s ease;
+        }
+        .cinema-viewport::before { top: 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .cinema-viewport::after { bottom: 0; border-top: 1px solid rgba(255,255,255,0.05); }
+
+        /* Screens and Stages */
+        .screen {
+            position: absolute; width: 100%; height: 100%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transform: scale(1.02);
+            transition: opacity 1.5s cubic-bezier(0.25, 1, 0.5, 1), transform 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+            padding: 10% 15%; text-align: center; z-index: 2;
+        }
+        .screen.active { opacity: 1; pointer-events: auto; transform: scale(1); }
+
+        /* Cinematic Controls & Inputs */
+        .setup-panel {
+            background: rgba(20, 20, 25, 0.85); padding: 40px; border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px);
+            max-width: 500px; width: 100%; text-align: left; max-height: 80vh; overflow-y: auto;
+        }
+        h2 { font-size: 1.8rem; letter-spacing: 2px; margin-bottom: 20px; color: var(--text-main); text-transform: uppercase; }
+        label { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-sub); display: block; margin-top: 15px; }
+        input, textarea, select {
+            width: 100%; padding: 12px; margin-top: 5px; background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #fff; font-family: inherit;
+        }
+        input:focus, textarea:focus, select:focus { border-color: var(--accent-glow); outline: none; }
+        
+        .cinema-btn {
+            background: transparent; color: var(--text-main); border: 1px solid var(--text-main);
+            padding: 14px 35px; border-radius: 4px; font-size: 0.9rem; letter-spacing: 2px;
+            text-transform: uppercase; cursor: pointer; transition: all 0.3s ease; margin-top: 30px;
+        }
+        .cinema-btn:hover { background: var(--text-main); color: #000; box-shadow: 0 0 20px rgba(255,255,255,0.4); }
+
+        /* Movie Background Image Canvas (Ken Burns Zoom Effect) */
+        .movie-canvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover; background-position: center; z-index: 1;
+            opacity: 0; filter: brightness(0.4) contrast(1.1);
+            transform: scale(1.1); transition: opacity 1.5s ease-in-out;
+        }
+        .movie-canvas.active {
+            opacity: 1;
+            animation: kenBurns 8s infinite alternate ease-in-out;
+        }
+        @keyframes kenBurns {
+            0% { transform: scale(1.05) translate(0, 0); }
+            100% { transform: scale(1.15) translate(-1%, -1%); }
+        }
+
+        /* Movie Subtitle Overlay Style */
+        .movie-subtitle {
+            font-size: 1.5rem; line-height: 1.8; max-width: 800px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.9); font-weight: 300;
+            animation: subtitleEntrance 1.5s ease;
+        }
+        @keyframes subtitleEntrance { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Sci-Fi Scanner Matrix */
+        .scanner-bar {
+            position: absolute; width: 100%; height: 2px; background: var(--accent-glow);
+            box-shadow: 0 0 20px var(--accent-glow); top: 0; left: 0;
+            animation: scanMovie 2.5s infinite ease-in-out; opacity: 0;
+        }
+        .screen.active .scanner-bar { opacity: 1; }
+        @keyframes scanMovie { 0% { top: 10%; } 50% { top: 90%; } 100% { top: 10%; } }
+
+        /* The Cake and Candle Structure */
+        .cinema-cake {
+            width: 160px; height: 90px; background: linear-gradient(to top, #2e1018, #4c1d24);
+            border-radius: 8px 8px 0 0; position: relative; margin-top: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+        .cinema-candle {
+            position: absolute; top: -35px; left: 50%; transform: translateX(-50%);
+            width: 8px; height: 35px; background: var(--accent-glow); border-radius: 2px;
+        }
+        .movie-flame {
+            position: absolute; top: -18px; left: 50%; transform: translateX(-50%);
+            width: 14px; height: 20px; background: #ff7700; border-radius: 50% 50% 20% 20%;
+            box-shadow: 0 0 25px #ff4400, 0 0 50px #ffaa00;
+            animation: movieFlicker 0.15s infinite alternate;
+        }
+        .movie-flame.extinguished { display: none; }
+        @keyframes movieFlicker { 
+            0% { transform: translateX(-50%) scale(1) rotate(-2deg); } 
+            100% { transform: translateX(-50%) scale(1.1) rotate(2deg); } 
+        }
+
+        /* Particle Overlay for Finale */
+        #confetti-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 5;
+        }
+    </style>
+</head>
+<body>
+
+<audio id="cinema-audio" loop></audio>
+<canvas id="confetti-layer"></canvas>
+
+<div class="cinema-viewport" id="viewport">
+    
+    <!-- THE CAMERA LENS (BACKGROUND IMAGE SLIDER) -->
+    <div id="bg-canvas-1" class="movie-canvas"></div>
+    <div id="bg-canvas-2" class="movie-canvas"></div>
+
+    <!-- MAIN SETUP MENU -->
+    <div id="screen-director" class="screen active">
+        <div class="setup-panel">
+            <h2>🎬 Director's Cut Setup</h2>
+            <p style="color: var(--text-sub); font-size: 0.85rem; margin-bottom: 20px;">Customize your dynamic cinematic story timeline before launching.</p>
+            
+            <label>Choose Color Grading/Theme</label>
+            <select id="movie-theme">
+                <option value="theme-romantic">🌹 Romantic Film (Default)</option>
+                <option value="theme-starry">🌌 Sci-Fi Horizon</option>
+                <option value="theme-vintage">📜 1940s Classic Cinema</option>
+                <option value="theme-minimal">🖤 Neo-Noir Monochrome</option>
+                <option value="theme-neon">⚡ Cyberpunk Symphony</option>
+            </select>
+
+            <label>Upload Score (.mp3 soundtrack)</label>
+            <input type="file" id="movie-track" accept="audio/*">
+
+            <label>Upload Cinematic Stills (Select 5 - 10 Photos)</label>
+            <input type="file" id="movie-frames" accept="image/*" multiple>
+
+            <label>Write the Narrative Letter Story</label>
+            <textarea id="movie-script" rows="4" placeholder="Type your dynamic script here... Each new paragraph becomes a sequence scene text line."></textarea>
+            
+            <button class="cinema-btn" style="width: 100%;" onclick="startMovie()">Action 🎥</button>
+        </div>
+    </div>
+
+    <!-- PROCEDURAL STORYLINE SCENES -->
+    <div id="screen-production" class="screen">
+        <div class="movie-subtitle" id="subtitle-renderer"></div>
+        <button class="cinema-btn" onclick="advanceScene()">Continue Narrative ➔</button>
+    </div>
+
+    <!-- AI CAMERA COMPUTATION STAGE -->
+    <div id="screen-processing" class="screen">
+        <div class="scanner-bar"></div>
+        <h2 style="letter-spacing: 5px; animation: pulse 2s infinite;">Analyzing Chemistry Matrix...</h2>
+        <p id="processing-logs" style="font-family: monospace; color: var(--accent-glow);"></p>
+    </div>
+
+    <!-- REVEAL SCENE & ROMANTIC COMPOSITION -->
+    <div id="screen-climax" class="screen">
+        <h2 style="font-size: 1.2rem; color: var(--text-sub);">AI Sentiment Generation:</h2>
+        <div class="movie-subtitle" id="ai-verdict-text" style="font-style: italic; margin-bottom: 40px; color: #fff;"></div>
+        <button class="cinema-btn" onclick="transitionToCake()">Make a Secret Wish ➔</button>
+    </div>
+
+    <!-- INTERACTIVE FINALE (WISH & CANDLE MECHANIC) -->
+    <div id="screen-finale" class="screen">
+        <h2>✨ Cast Your Wish</h2>
+        <p style="color: var(--text-sub); margin-bottom: 25px;">Type a wish to transmit securely directly to the sender's heart.</p>
+        <input type="text" id="final-wish-input" style="max-width: 400px; text-align: center;" placeholder="I wish that we always...">
+        <button class="cinema-btn" id="wish-send-btn" onclick="sendWishData()">Transmit Wish ⚡</button>
+
+        <div id="candle-interaction-box" style="display:none; animation: subtitleEntrance 1s ease;">
+            <div class="cinema-cake">
+                <div class="cinema-candle"><div class="movie-flame" id="interactive-flame"></div></div>
+            </div>
+            <button class="cinema-btn" onclick="extinguishCandle()">Blow Candle 🌬️</button>
+        </div>
+    </div>
+
+    <!-- THE END SCREEN -->
+    <div id="screen-credits" class="screen">
+        <h1 style="font-size: 3rem; letter-spacing: 10px; margin: 0;">HAPPY BIRTHDAY</h1>
+        <p style="letter-spacing: 4px; color: var(--text-sub); margin-top: 10px;">YOUR WISH HAS BEEN SENT. FOREVER LOCKED IN MY HEART.</p>
+        <p style="font-size: 0.8rem; margin-top: 50px; opacity: 0.5;">FADE OUT</p>
+    </div>
+
+</div>
+
+<script>
+    let photoURLs = [];
+    let scriptParagraphs = [];
+    let currentSceneIndex = 0;
+    let activeCanvasId = 'bg-canvas-1';
+    let selectedThemeMode = 'theme-romantic';
+
+    const structuralAiQuotes = {
+        'theme-romantic': "System report: Hyper-resonance detected. Every frame tracks 100% mutual gravity. The algorithms confirm you are the poetic anchor of my existence.",
+        'theme-starry': "Deep space metrics complete. Your smile emits more lumens than an active supernova. Our timeline is written globally across interstellar coordinates.",
+        'theme-vintage': "Archival processing completed. The structural dynamic reveals timeless devotion reminiscent of cinema's finest love sagas.",
+        'theme-minimal': "Analysis matrix: Zero distortion found. Absolute structural beauty is clear. You are the vital constant in my daily script.",
+        'theme-neon': "Cyber-frequency sync successful. You are operating at a voltage rate that breaks traditional processing limits. Electric, infinite connection."
+    };
+
+    function startMovie() {
+        const musicUploaded = document.getElementById('movie-track').files[0];
+        const framesUploaded = document.getElementById('movie-frames').files;
+        const textScriptRaw = document.getElementById('movie-script').value;
+        selectedThemeMode = document.getElementById('movie-theme').value;
+
+        if(framesUploaded.length < 5) {
+            alert("Director alert: Please load at least 5 frames to construct the timeline.");
+            return;
+        }
+
+        document.body.className = selectedThemeMode;
+
+        // Process custom music pipeline
+        if(musicUploaded) {
+            const audioTrack = document.getElementById('cinema-audio');
+            audioTrack.src = URL.createObjectURL(musicUploaded);
+            audioTrack.play().catch(() => console.log('Audio playback primed after user action.'));
+        }
+
+        // Generate object links safely
+        photoURLs = Array.from(framesUploaded).map(file => URL.createObjectURL(file));
+        
+        // Parse raw script line entries
+        scriptParagraphs = textScriptRaw.split('\n').filter(p => p.trim() !== "");
+        if(scriptParagraphs.length === 0) {
+            scriptParagraphs = ["A beautiful story began the day you entered the world...", "Every frame captured with you holds a lifetime of magic.", "Happy Birthday, my favorite person."];
+        }
+
+        // Trigger Screen Transitions
+        document.getElementById('screen-director').classList.remove('active');
+        document.getElementById('screen-production').classList.add('active');
+        
+        renderSceneTimeline();
+    }
+
+    function renderSceneTimeline() {
+        const textDisplay = document.getElementById('subtitle-renderer');
+        textDisplay.innerText = scriptParagraphs[Math.min(currentSceneIndex, scriptParagraphs.length - 1)];
+
+        // Cross-fading camera pan visuals alternating between two layered layers
+        const nextCanvasId = activeCanvasId === 'bg-canvas-1' ? 'bg-canvas-2' : 'bg-canvas-1';
+        const currentCanvas = document.getElementById(activeCanvasId);
+        const nextCanvas = document.getElementById(nextCanvasId);
+
+        nextCanvas.style.backgroundImage = `url(${photoURLs[currentSceneIndex % photoURLs.length]})`;
+        nextCanvas.classList.add('active');
+        currentCanvas.classList.remove('active');
+
+        activeCanvasId = nextCanvasId;
+    }
+
+    function advanceScene() {
+        currentSceneIndex++;
+        if (currentSceneIndex < scriptParagraphs.length || currentSceneIndex < photoURLs.length) {
+            renderSceneTimeline();
+        } else {
+            runMovieAiProcessor();
+        }
+    }
+
+    function runMovieAiProcessor() {
+        document.getElementById('screen-production').classList.remove('active');
+        document.getElementById('screen-processing').classList.add('active');
+
+        const logLines = ["Deconstructing visual hues...", "Calculating emotional frequency...", "Extracting joy data constants...", "Rendering romantic script..."];
+        let logCounter = 0;
+
+        let logInterval = setInterval(() => {
+            if(logCounter < logLines.length) {
+                document.getElementById('processing-logs').innerText = `> ${logLines[logCounter]}`;
+                logCounter++;
+            } else {
+                clearInterval(logInterval);
+                document.getElementById('ai-verdict-text').innerText = structuralAiQuotes[selectedThemeMode];
+                document.getElementById('screen-processing').classList.remove('active');
+                document.getElementById('screen-climax').classList.add('active');
+            }
+        }, 1200);
+    }
+
+    function transitionToCake() {
+        document.getElementById('screen-climax').classList.remove('active');
+        document.getElementById('screen-finale').classList.add('active');
+    }
+
+    function sendWishData() {
+        const wishValue = document.getElementById('final-wish-input').value;
+        if(!wishValue.trim()) {
+            alert("Cast a genuine wish before sending!");
+            return;
+        }
+        alert("✨ Transmission successful. Your hidden wish is now on its way back to the sender.");
+        document.getElementById('wish-send-btn').style.display = 'none';
+        document.getElementById('candle-interaction-box').style.display = 'block';
+    }
+
+    function extinguishCandle() {
+        document.getElementById('interactive-flame').classList.add('extinguished');
+        startConfettiRain();
+        setTimeout(() => {
+            document.getElementById('screen-finale').classList.remove('active');
+            document.getElementById('screen-credits').classList.add('active');
+        }, 1500);
+    }
+
+    // Canvas Confetti Render Engine
+    function startConfettiRain() {
+        const canvas = document.getElementById('confetti-layer');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        let particles = [];
+        for(let i=0; i<150; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height - canvas.height,
+                r: Math.random() * 6 + 4,
+                d: Math.random() * canvas.height,
+                color: `hsl(${Math.random() * 360}, 80%, 60%)`,
+                tilt: Math.random() * 10 - 5
+            });
+        }
+
+        function drawFrames() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((p, idx) => {
+                ctx.beginPath();
+                ctx.lineWidth = p.r;
+                ctx.strokeStyle = p.color;
+                ctx.moveTo(p.x + p.tilt + p.r/2, p.y);
+                ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r/2);
+                ctx.stroke();
+                
+                p.y += Math.cos(p.d) + 1 + p.r/2;
+                p.x += Math.sin(0.01) * 2;
+                
+                if (p.y > canvas.height) {
+                    particles[idx] = { ...p, x: Math.random() * canvas.width, y: -20 };
+                }
+            });
+            requestAnimationFrame(drawFrames);
+        }
+        drawFrames();
+    }
+</script>
+</body>
+</html>
