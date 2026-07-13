@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Story | Happy Birthday</title>
+    <style>
+        :root {
+            --bg-color: #fce4ec;
+            --card-bg: #ffffff;
+            --text-color: #4a148c;
+            --accent-color: #ff4081;
+            --font-family: 'Georgia', serif;
+        }
+
+        /* Themes */
+        .theme-romantic {
+            --bg-color: #fdf2f8; --card-bg: #ffffff; --text-color: #9d174d; --accent-color: #f43f5e; --font-family: 'Georgia', serif;
+        }
+        .theme-starry {
+            --bg-color: #0f172a; --card-bg: #1e293b; --text-color: #f8fafc; --accent-color: #38bdf8; --font-family: 'Courier New', monospace;
+        }
+        .theme-vintage {
+            --bg-color: #f5f5dc; --card-bg: #faf0e6; --text-color: #4a3b32; --accent-color: #8b4513; --font-family: 'Times New Roman', serif;
+        }
+        .theme-minimal {
+            --bg-color: #fafafa; --card-bg: #ffffff; --text-color: #171717; --accent-color: #737373; --font-family: 'Arial', sans-serif;
+        }
+        .theme-neon {
+            --bg-color: #0a0a0a; --card-bg: #141414; --text-color: #39ff14; --accent-color: #ff007f; --font-family: 'Impact', sans-serif;
+        }
+
+        * { box-sizing: border-box; transition: all 0.4s ease; }
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-family);
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; overflow-x: hidden;
+        }
+
+        .container {
+            width: 90%; max-width: 600px;
+            background: var(--card-bg);
+            padding: 30px; border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center; position: relative;
+        }
+
+        .screen { display: none; }
+        .screen.active { display: block; animation: fadeIn 0.6s ease-in-out; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        h1, h2 { margin-bottom: 20px; }
+        button {
+            background-color: var(--accent-color); color: white;
+            border: none; padding: 12px 25px; border-radius: 25px;
+            cursor: pointer; font-size: 16px; font-weight: bold;
+            margin-top: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        button:hover { transform: scale(1.05); opacity: 0.9; }
+
+        /* Creator Panel Styles */
+        .form-group { text-align: left; margin-bottom: 15px; }
+        label { font-weight: bold; display: block; margin-bottom: 5px; }
+        input, textarea, select {
+            width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-family: inherit;
+        }
+
+        /* Story Styles */
+        .story-img {
+            width: 100%; max-height: 350px; object-fit: cover;
+            border-radius: 15px; margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .letter-text { font-style: italic; white-space: pre-line; line-height: 1.6; }
+
+        /* Scanning Effect */
+        .scan-container { position: relative; display: inline-block; width: 100%; }
+        .scan-line {
+            position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+            background: var(--accent-color); box-shadow: 0 0 15px var(--accent-color);
+            animation: scan 2s infinite ease-in-out;
+        }
+        @keyframes scan { 0% { top: 0%; } 50% { top: 100%; } 100% { top: 0%; } }
+
+        /* Candle Cake Styles */
+        .cake {
+            position: relative; width: 150px; height: 100px;
+            background: #f43f5e; margin: 30px auto 10px; border-radius: 10px 10px 0 0;
+        }
+        .candle {
+            position: absolute; top: -40px; left: 50%; transform: translateX(-50%);
+            width: 12px; height: 40px; background: #38bdf8; border-radius: 4px;
+        }
+        .flame {
+            position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+            width: 16px; height: 20px; background: #ffaa00; border-radius: 50% 50% 20% 20%;
+            box-shadow: 0 0 10px #ffaa00; animation: flicker 0.1s infinite alternate;
+        }
+        .flame.blown { display: none; }
+        @keyframes flicker { from { transform: translateX(-50%) scale(1); } to { transform: translateX(-50%) scale(1.1) skewX(5deg); } }
+    </style>
+</head>
+<body>
+
+<audio id="bg-music" loop></audio>
+
+<div class="container" id="main-container">
+    
+    <!-- STEP 1: SENDER SETUP PANEL -->
+    <div id="screen-setup" class="screen active">
+        <h2>💝 Create a Birthday Story</h2>
+        <div class="form-group">
+            <label>1. Pick a Theme Style</label>
+            <select id="setup-theme">
+                <option value="theme-romantic">❤️ Romantic Rose</option>
+                <option value="theme-starry">✨ Starry Night</option>
+                <option value="theme-vintage">📜 Vintage Letters</option>
+                <option value="theme-minimal">🖤 Sleek Modern Minimal</option>
+                <option value="theme-neon">⚡ Cyber Neon</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>2. Upload Custom Music (.mp3)</label>
+            <input type="file" id="setup-music" accept="audio/*">
+        </div>
+        <div class="form-group">
+            <label>3. Upload Photos (Select 5 to 10)</label>
+            <input type="file" id="setup-photos" accept="image/*" multiple>
+            <small id="photo-count-warn" style="color:red; display:none;">Please select between 5 and 10 photos.</small>
+        </div>
+        <div class="form-group">
+            <label>4. Write the Birthday Letter Story</label>
+            <textarea id="setup-letter" rows="5" placeholder="Once upon a time, a beautiful soul was born... Write your heart out here."></textarea>
+        </div>
+        <button onclick="generateBirthdayLink()">Generate & Start Experience ✨</button>
+    </div>
+
+    <!-- STEP 2: STORY IMAGES SYSTEM -->
+    <div id="screen-story" class="screen">
+        <h2 id="story-title">Memories of Us... ✨</h2>
+        <img id="story-viewer" class="story-img" src="" alt="Memory">
+        <p id="story-counter" style="font-weight: bold;"></p>
+        <button id="next-photo-btn" onclick="nextPhoto()">Next Memory ➡️</button>
+    </div>
+
+    <!-- STEP 3: PHOTO ANALYSIS RUNNING -->
+    <div id="screen-analysis" class="screen">
+        <h2>Analysing Our Moments... 🧠💝</h2>
+        <p>Our AI engine is scanning our photos for joy levels, chemistry, and beautiful memories...</p>
+        <div class="scan-container">
+            <div class="scan-line"></div>
+            <img id="analysis-placeholder" class="story-img" src="" style="opacity: 0.6;">
+        </div>
+        <p id="analysis-status">Detecting smiles...</p>
+    </div>
+
+    <!-- STEP 4: ROMANTIC QUOTE + ORIGINAL LETTER -->
+    <div id="screen-letter" class="screen">
+        <h2>My Romantic AI Verdict 💌</h2>
+        <blockquote id="ai-quote" style="font-size: 1.2rem; font-weight: bold; background: rgba(0,0,0,0.05); padding: 15px; border-radius: 10px;"></blockquote>
+        <hr style="border: 0; border-top: 1px solid var(--accent-color); margin: 25px 0;">
+        <p class="letter-text" id="final-letter-box"></p>
+        <button onclick="goToCakeScreen()">Make a Wish 🎂</button>
+    </div>
+
+    <!-- STEP 5: WISH & BLOW CANDLES -->
+    <div id="screen-cake" class="screen">
+        <h2>🎂 Make a Secret Wish</h2>
+        <p>Type your deepest wish. When you hit submit, it will be sent straight to my heart. Then blow the candle!</p>
+        
+        <div class="form-group">
+            <input type="text" id="receiver-wish" placeholder="I wish that we always...">
+        </div>
+        <button id="wish-submit-btn" onclick="submitWish()">Submit Wish to Sender ✨</button>
+
+        <div id="cake-area" style="display: none;">
+            <div class="cake">
+                <div class="candle"><div class="flame" id="candle-flame"></div></div>
+            </div>
+            <button onclick="blowCandle()" style="background: #10b981;">Blow Out Candle 🌬️</button>
+        </div>
+    </div>
+
+    <!-- FINAL SCREEN -->
+    <div id="screen-end" class="screen">
+        <h2>✨ Happy Birthday! ✨</h2>
+        <p>Your wish has been securely locked into my heart forever. May this year bring you endless magic.</p>
+        <div style="font-size: 3rem;">🎉🥳❤️</div>
+    </div>
+
+</div>
+
+<script>
+    // App State Management
+    let uploadedPhotos = [];
+    let currentPhotoIdx = 0;
+    let chosenTheme = 'theme-romantic';
+
+    // Romantic presets for simulated AI output depending on selected theme
+    const romanticQuotes = {
+        'theme-romantic': "Analysis Complete: 100% Chemistry detected. The pixels confirm that your smile shines brighter than any star, and my heart beat spikes every time we capture a memory.",
+        'theme-starry': "Cosmic Scan Complete: The alignment of joy in these images indicates a connection written in the nebula. You are my universe.",
+        'theme-vintage': "Timeless Analysis Complete: These photos exhibit a rare, classical kind of devotion. A love story meant for history books.",
+        'theme-minimal': "Analysis Complete: Pure essence discovered. Stripping away the noise, the core data reveals you are my absolute everything.",
+        'theme-neon': "Cyber Scan Complete: Electric currents of pure passion found. Our vibe operates on a frequency higher than any machine can measure."
+    };
+
+    // Transition Screens Function
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+    }
+
+    // Capture inputs and generate the flow
+    function generateBirthdayLink() {
+        const musicFile = document.getElementById('setup-music').files[0];
+        const photoFiles = document.getElementById('setup-photos').files;
+        const letterText = document.getElementById('setup-letter').value;
+        chosenTheme = document.getElementById('setup-theme').value;
+
+        // Validation
+        if(photoFiles.length < 5 || photoFiles.length > 10) {
+            document.getElementById('photo-count-warn').style.display = 'block';
+            return;
+        }
+        document.getElementById('photo-count-warn').style.display = 'none';
+
+        // Apply Theme Global Styles
+        document.body.className = chosenTheme;
+
+        // Handle Music Load
+        if(musicFile) {
+            const audioUrl = URL.createObjectURL(musicFile);
+            const player = document.getElementById('bg-music');
+            player.src = audioUrl;
+            player.play().catch(e => console.log("Audio autoplay waiting for interaction"));
+        }
+
+        // Process Photos into local displayable object URLs
+        uploadedPhotos = [];
+        for(let i=0; i < photoFiles.length; i++) {
+            uploadedPhotos.push(URL.createObjectURL(photoFiles[i]));
+        }
+
+        // Setup text
+        document.getElementById('final-letter-box').innerText = letterText || "Happy Birthday! Wishing you an incredible day filled with love and magic!";
+
+        // Begin Story Timeline Presentation
+        currentPhotoIdx = 0;
+        presentPhoto();
+        showScreen('screen-story');
+    }
+
+    function presentPhoto() {
+        document.getElementById('story-viewer').src = uploadedPhotos[currentPhotoIdx];
+        document.getElementById('story-counter').innerText = `Memory ${currentPhotoIdx + 1} of ${uploadedPhotos.length}`;
+    }
+
+    function nextPhoto() {
+        if(currentPhotoIdx < uploadedPhotos.length - 1) {
+            currentPhotoIdx++;
+            presentPhoto();
+        } else {
+            // Photos ended, proceed to custom simulated romantic AI analysis
+            runAiAnalysis();
+        }
+    }
+
+    function runAiAnalysis() {
+        showScreen('screen-analysis');
+        document.getElementById('analysis-placeholder').src = uploadedPhotos[0];
+        
+        const statuses = ["Analyzing pixel warmth...", "Measuring laughter ratios...", "Calculating romantic resonance...", "Syncing heartbeats..."];
+        let count = 0;
+        
+        let interval = setInterval(() => {
+            if(count < statuses.length) {
+                document.getElementById('analysis-status').innerText = statuses[count];
+                count++;
+            } else {
+                clearInterval(interval);
+                // Print custom romantic quote based on user's theme selection
+                document.getElementById('ai-quote').innerText = romanticQuotes[chosenTheme];
+                showScreen('screen-letter');
+            }
+        }, 1200);
+    }
+
+    function goToCakeScreen() {
+        showScreen('screen-cake');
+    }
+
+    function submitWish() {
+        const wishText = document.getElementById('receiver-wish').value;
+        if(!wishText.trim()) {
+            alert("Please make a real wish!");
+            return;
+        }
+
+        // Simulating immediate delivery back to sender
+        alert(`✨ Your beautiful wish has been sent straight to the sender! ✨`);
+        
+        // Hide wish box, display cake candle blowing option
+        document.getElementById('wish-submit-btn').style.display = 'none';
+        document.getElementById('cake-area').style.display = 'block';
+    }
+
+    function blowCandle() {
+        document.getElementById('candle-flame').classList.add('blown');
+        setTimeout(() => {
+            showScreen('screen-end');
+        }, 1000);
+    }
+</script>
+</body>
+</html>
